@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tag manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Tag manager</h1>
+  <div class="search">
+    <label>Search by tags<input type="text"></label>
+    <div class="searchTag">tag</div>
+  </div>
+  <table>
+    <thead>
+      <tr><th>name</th><th>tag</th><th id="add-button"><input type="button" value="add"></th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>ABC234D</th>
+        <th><a href="">DP</a></th>
+        <th class="button"><input type="button" value="delete"></th>
+      </tr>
+      <tr>
+        <th>ABC234E</th>
+        <th><a href="">DFS</a><a>要復習</a></th>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="mask hidden"></div>
+
+  <div class="add-window hidden">
+    <p>
+      name<input type="text">
+      url<input type="text">
+    </p>
+    <input type="text">tag
+    <input type="button" value="決定" id="select-button">
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

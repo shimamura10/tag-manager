@@ -1,0 +1,8 @@
+  let l = 5
+  for (let index = 0; index < l; index++) {
+    console.log(index);
+    l -= 1;
+  }
+
+  出力：0, 1, 2
+  forの条件式は毎回判定してるぽい（最初にindexの動きが決まるわけじゃない）

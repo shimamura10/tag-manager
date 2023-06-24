@@ -46,7 +46,8 @@ a {
   left: 0;
 }
 
-.mask.hidden {
+#origin-tbody,
+.hidden {
   display: none;
 }
 
@@ -72,4 +73,21 @@ a {
 #select-button {
   display: block;
   margin: auto auto 24px;
+}
+
+#added-tag-space {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0;
+  margin-bottom: 24px;
+  /* justify-content: space-between; */
+}
+
+.add-tag {
+  margin: 0 24px 8px 0;
+}
+
+#added-tag {
+  border: 1px solid black;
+  border-radius: 4px;
 }

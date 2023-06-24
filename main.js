@@ -11,7 +11,10 @@
   const addUrl = document.querySelector('#add-url');
   const addTag = document.querySelector('.add-tag');
   const addedTagSpace = document.querySelector('#added-tag-space');
+  const inputSearchTag = document.querySelector('#input-search-tag');
+  const displaySearchTag = document.querySelector('#display-search-tag');
   const LSkey = 'informationList';
+  const targetTags = [];
   const informationList = JSON.parse(localStorage[LSkey]);
   const originInformation = {
     name: 'sampleName',
@@ -20,6 +23,16 @@
   }
 
   informationList['key-1'] = (Object.assign({}, originInformation));
+
+  document.querySelector('#add-search-tag').addEventListener('click', () => {
+    const tag = document.createElement('a');
+    tag.classList.add("searchTag");
+    tag.text = inputSearchTag.value;
+    displaySearchTag.appendChild(tag);
+    inputSearchTag.value = '';
+    targetTags.push(tag.text);
+    display();
+  })
 
   // informationListの内容を表示
   Object.keys(informationList).forEach(key => {
@@ -92,5 +105,24 @@
   // informationListをローカルストレージに保存
   function save(informationList) {
     localStorage.setItem(LSkey, JSON.stringify(informationList))
+  }
+
+  function display() {
+    Object.keys(informationList).forEach(key => {
+      let ok = false;
+      informationList[key].tag.forEach(tag => {
+        targetTags.forEach(targetTags => {
+          if (tag == targetTags) {
+            ok = true
+            return;
+          }
+        });
+      });
+      if (ok) {
+        document.querySelector(`#${key}`).classList.remove('hidden');
+      } else {
+        document.querySelector(`#${key}`).classList.add('hidden');
+      }
+    });
   }
 }

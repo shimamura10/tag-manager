@@ -10,7 +10,9 @@ body {
 
 .searchTag {
   border: 1px solid black;
-  border-radius: 15%;
+  border-radius: 4px;
+  display: inline;
+  padding: 0 4px;
 }
 
 table {

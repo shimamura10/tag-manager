@@ -107,10 +107,10 @@
     name.setAttribute("href", information.url);
     information.tag.forEach(infoTag => {
       if (infoTag == '') {return;}
-      const newTag = document.createElement('a');
+      const newTag = document.createElement('li');
       newTag.classList.add('display-tag');
-      newTag.text = infoTag;
-      document.querySelector(`#${key} .tag-th`).appendChild(newTag);
+      newTag.textContent = infoTag;
+      document.querySelector(`#${key} .tag-ul`).appendChild(newTag);
     });
     // deleteボタンの追加
     const deleteButton = document.querySelector(`#${key} .delete-button`);

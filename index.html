@@ -8,6 +8,14 @@
 </head>
 <body>
   <h1>Tag manager</h1>
+  <div>
+    <p>ブックマークをタグで管理できるサイトです。</p>
+    <p>右上の登録ボタンからリストに追加してください。</p>
+  </div>
+  <!-- 登録ボタン -->
+  <!-- <a href="" class="btn btn--orange btn--radius">PUSH!!!!</a> -->
+  <input type="button" value="登録＋" id="add-button" class="btn btn--orange btn--radius">
+
   <div class="search">
     <div>
       Search by tags 
@@ -15,23 +23,22 @@
       <button id="add-search-tag">追加</button>
     </div>
   </div>
-  <div id="display-search-tag">
-    <!-- <a class="searchTag">tag
-      <button>X</button>
-    </a> -->
+  <div id="display-search-tag"></div>
+  <!-- テーブル -->
+  <div class="scroll-table">
+    <table>
+      <thead>
+        <tr><th>name</th><th>tag</th><th width = "64px"></th></tr>
+      </thead>
+      <tbody id="main-table">
+        <tr class="main-tbody" id="origin-tbody">
+          <td><a href="" class="display-name" target="_blank"></a></td>
+          <td><ul class="tag-ul"></ul></td>
+          <td class="delete-button" align="center"><input type="button" value="delete"></td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <table>
-    <thead>
-      <tr><th>name</th><th>tag</th><th id="add-button"><input type="button" value="add"></th></tr>
-    </thead>
-    <tbody id="main-table">
-      <tr class="main-tbody" id="origin-tbody">
-        <th><a href="" class="display-name">ABC234D</a></th>
-        <th class="tag-th"></th>
-        <th class="delete-button"><input type="button" value="delete"></th>
-      </tr>
-    </tbody>
-  </table>
 
   <div class="mask hidden"></div>
 

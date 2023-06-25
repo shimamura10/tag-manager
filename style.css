@@ -4,10 +4,11 @@ body {
   margin-left: 16px;
 }
 
+/* 検索まわり */
 .search {
   display: flex;
+  font-size: 1.5rem;
 }
-
 .searchTag {
   border: 1px solid black;
   border-radius: 4px;
@@ -15,30 +16,45 @@ body {
   padding: 0 4px;
 }
 
+/* 表 */
 table {
   border-collapse: collapse;
   margin-top: 8px;
+  table-layout: fixed;
+  width: 80%;
 }
-
 thead {
   background-color: lightgray;
 }
-
-th {
+th,
+td {
   border: 1px solid black;
   margin: 0;
   border-collapse: collapse;
 }
-
-a {
+td {
+  overflow: auto;
+  white-space: nowrap;
+}
+.tag-ul {
+  display: flex;
+  margin: 0;
+  padding-left: 32px;
+}
+.display-tag {
+  margin-right: 32px;
+}
+#add-button {
+  background-color: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.display-name {
   margin: auto 8px;
 }
 
-.button {
-  border: none;
-  background-color: white;
-}
-
+/* 登録ウィンドウ */
 .mask {
   background: rgba(0,0,0,0.4);
   position: fixed;
@@ -47,18 +63,17 @@ a {
   right: 0;
   left: 0;
 }
-
 #origin-tbody,
 .hidden {
   display: none;
 }
-
 .add-window {
   border: 1px solid black;
   border-radius: 20px;
   background-color: #ccc;
-  width: 440px;
-  height: 240px;
+  width: 80%;
+  max-width: 600px;
+  /* height: 240px; */
   padding: 40px;
   position: absolute;
   left: 0;
@@ -67,29 +82,76 @@ a {
   top: 100px;
   transition: transform 0.4s;
 }
-
 .add-window.hidden {
   transform: translate(0, -500px);
 }
-
 #select-button {
   display: block;
   margin: auto auto 24px;
 }
-
 #added-tag-space {
   display: flex;
   flex-wrap: wrap;
   margin-top: 0;
   margin-bottom: 24px;
-  /* justify-content: space-between; */
 }
-
 .add-tag {
   margin: 0 24px 8px 0;
 }
-
 #added-tag {
   border: 1px solid black;
   border-radius: 4px;
+}
+
+/* 登録ボタンのデザイン */
+*,
+*:before,
+*:after {
+  -webkit-box-sizing: inherit;
+  box-sizing: inherit;
+}
+html {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.btn,
+a.btn,
+button.btn {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.5;
+  position: relative;
+  display: inline-block;
+  padding: 1rem 4rem;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  letter-spacing: 0.1em;
+  color: #212529;
+  border-radius: 0.5rem;
+}
+.btn--orange,
+a.btn--orange {
+  color: #fff;
+  background-color: #eb6100;
+}
+.btn--orange:hover,
+a.btn--orange:hover {
+  color: #fff;
+  background: #f56500;
+}
+a.btn--radius {
+  border-radius: 100vh;
+}
+#add-button {
+  position: absolute;
+  top: 36px;
+  right: 36px;
 }

@@ -72,9 +72,7 @@
       const tag = addedTagSpace.children[i];
       cloneInformation.tag.push(tag.value);
     }
-    // const key = 'key-' + String(Object.keys(informationList).length + 1);
     const key = nextKey();
-    // const key = cloneInformation.name + cloneInformation.url;  //主キーは名前＋url
     informationList[key] = cloneInformation;
 
     // 情報を書き込む

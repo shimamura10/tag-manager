@@ -27,13 +27,14 @@
   <div class="scroll-table">
     <table>
       <thead>
-        <tr><th>name</th><th>tag</th><th width = "64px"></th></tr>
+        <tr><th>name</th><th>tag</th><th width = "64px"></th><th width = "64px"></th></tr>
       </thead>
       <tbody id="main-table">
         <tr class="main-tbody" id="origin-tbody">
           <td><a href="" class="display-name" target="_blank"></a></td>
           <td><ul class="tag-ul"></ul></td>
-          <td class="delete-button" align="center"><input type="button" value="delete"></td>
+          <td align="center"><input type="button" class="edit-button" value="edit"></td>
+          <td align="center"><input type="button" class="delete-button" value="delete"></td>
         </tr>
       </tbody>
     </table>
@@ -43,10 +44,10 @@
 
   <div class="add-window hidden">
     <p>
-      name<input type="text" id="add-name">
-      url<input type="text" id="add-url">
+      name <input type="text" id="add-name">
+      url <input type="text" id="add-url">
     </p>
-    <div>tag <input type="button" value="追加" id="add-tag-button"></div>
+    <div>tags <input type="button" value="追加" id="add-tag-button"></div>
     <div id="added-tag-space">
       <input type="text" class="add-tag">
     </div>

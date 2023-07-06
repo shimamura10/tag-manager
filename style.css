@@ -44,6 +44,10 @@ td {
 .display-tag {
   margin-right: 32px;
 }
+.delete-button {
+  color: red;
+}
+
 #add-button {
   background-color: red;
   color: white;

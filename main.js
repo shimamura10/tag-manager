@@ -3,7 +3,7 @@
 {
   const addButton = document.querySelector('#add-button');
   const mask = document.querySelector('.mask');
-  const addWindow = document.querySelector('.add-window');
+  const informationWindow = document.querySelector('.add-window');
   const selectButton = document.querySelector('#select-button');
   const mainTable = document.querySelector('#main-table');
   const originTbody = document.querySelector('#origin-tbody');
@@ -16,6 +16,7 @@
   const LSkey = 'informationList';
   const targetTags = [];
   let informationList = {};
+  let informationWindowKey = '';
   if (!(localStorage[LSkey] == "undefined" || typeof localStorage[LSkey] == "undefined")) {
     informationList = JSON.parse(localStorage[LSkey]);
   }
@@ -24,11 +25,11 @@
     url: 'sampleUrl',
     tag: ['sampleTag1', 'sampleTag2'],
   }
-  // informationList[nextKey()] = (Object.assign({}, originInformation));
 
   // タグ検索の追加ボタンを押したときの処理
   document.querySelector('#add-search-tag').addEventListener('click', () => {
     // タグ要素の追加と表示
+    if (inputSearchTag.value == '') {return;}
     const tag = document.createElement('a');
     tag.classList.add("searchTag");
     tag.text = inputSearchTag.value;
@@ -58,11 +59,19 @@
   // リストに追加する情報の入力画面を表示
   addButton.addEventListener('click', () => {
     mask.classList.remove('hidden');
-    addWindow.classList.remove('hidden');
+    informationWindow.classList.remove('hidden');
+    informationWindow.classList.add('add');
   });
 
-  // リストに情報を追加
+  // ブックマーク情報ウィンドウの決定ボタンの処理
   selectButton.addEventListener('click', () => {
+    if (informationWindow.classList.contains('add')) { //登録ボタンを押したときの処理
+      informationWindowKey = nextKey();
+      informationWindow.classList.remove('add');
+    } else if (informationWindow.classList.contains('edit')) { //editボタンを押したときの処理
+      deliteInformation(informationWindowKey);
+      informationWindow.classList.remove('edit');
+    }
     // 情報を読み込む
     const cloneInformation = Object.assign({}, originInformation);
     cloneInformation.name = addName.value;
@@ -70,13 +79,13 @@
     cloneInformation.tag = [];
     for (let i = 0; i < addedTagSpace.children.length; i++) {
       const tag = addedTagSpace.children[i];
+      if (tag.value == '') {continue;}
       cloneInformation.tag.push(tag.value);
+      console.log(`tag[${i}]:${tag.value}`);
     }
-    const key = nextKey();
-    informationList[key] = cloneInformation;
-
+    informationList[informationWindowKey] = cloneInformation;
     // 情報を書き込む
-    displayInformation(cloneInformation, key);
+    displayInformation(cloneInformation, informationWindowKey);
     save();
     // ウィンドウを閉じる
     closeWindow();
@@ -86,13 +95,12 @@
     cloneTag();
   });
 
-  // addTag.addEventListener('change', cloneTag);
-
-  function cloneTag() {
-    const cloneTag = addTag.cloneNode(true);
-    // cloneTag.addEventListener('change', cloneTag);
-    addedTagSpace.appendChild(cloneTag);
-    cloneTag.value = '';
+  function cloneTag(num=1) {
+    for (let i = 0; i < num; i++) {
+      const cloneTag = addTag.cloneNode(true);
+      addedTagSpace.appendChild(cloneTag);
+      cloneTag.value = '';
+    }
   }
 
   // informationをサイト上のリストに追加
@@ -113,21 +121,35 @@
     // deleteボタンの追加
     const deleteButton = document.querySelector(`#${key} .delete-button`);
     deleteButton.addEventListener('click', () => {
-      const key = deleteButton.parentElement.id;
-      delete informationList[key];
-      deleteButton.parentElement.remove();
-      console.log(informationList);
-      save();
-      console.log(informationList);
-    })
+      if (confirm("本当に削除しますか？")){
+        const key = deleteButton.closest('.main-tbody').id;
+        deliteInformation(key);
+      }
+      });
+    // editボタンの追加
+    const editButton = document.querySelector(`#${key} .edit-button`);
+    editButton.addEventListener('click', () => {
+      const key = editButton.closest('.main-tbody').id;
+      // ブックマーク情報ウィンドウに現在の情報を表示
+      mask.classList.remove('hidden');
+      informationWindow.classList.remove('hidden');
+      informationWindow.classList.add('edit');
+      informationWindowKey = key;
+      addName.value = informationList[key].name;
+      addUrl.value = informationList[key].url;
+      cloneTag(informationList[key].tag.length-1);
+      informationList[key].tag.forEach((tag,i) => {
+        addedTagSpace.children[i].value = tag;
+      });
+    });
   }
 
   // informationListをローカルストレージに保存
   function save() {
     localStorage.setItem(LSkey, JSON.stringify(informationList))
-    console.log(informationList);
   }
 
+  // タグによる検索
   function search() {
     console.log(targetTags.length);
     if (targetTags.length == 0) { //絞り込みなし
@@ -161,6 +183,7 @@
     }
   }
 
+  // 次のキーを返す
   function nextKey() {
     let tmp = localStorage['keyNum'];
     if (typeof tmp == "undefined") {
@@ -170,9 +193,10 @@
     return 'key-' + tmp;
   }
 
+  // ブックマーク情報ウィンドウを閉じる
   function closeWindow() {
     mask.classList.add('hidden');
-    addWindow.classList.add('hidden');
+    informationWindow.classList.add('hidden');
     addName.value = '';
     addUrl.value = '';
     const l = addedTagSpace.children.length;
@@ -185,6 +209,14 @@
     }
   }
 
+  // 登録されている情報を消す
+  function deliteInformation(key) {
+    delete informationList[key];
+    document.querySelector(`#${key}`).remove();
+    save();
+  }
+
+  // ブックマーク情報ウィンドウの外側をクリックすると閉じる
   mask.addEventListener('click', () => {
     closeWindow();
   })

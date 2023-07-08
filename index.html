@@ -17,9 +17,23 @@
 
   <div class="search">
     <div>
-      Search by tags 
+      Search in tags 
       <input type="text" id="input-search-tag">
       <button id="add-search-tag">追加</button>
+    </div>
+    <div class="sort">
+      Sort by
+      <select id="sort-colum-list">
+        <option class="sortColum" value="addedTime">登録した時刻</option>
+        <option class="sortColum" value="lastUsedTime">最後に使った時刻</option>
+        <option class="sortColum" value="usedNumber">使った頻度</option>
+      </select>
+      <div id="panel">
+        <div class="sort-indicator asc">
+          
+        </div>
+      </div>
+      <!-- <button id="sort-button">並び変え</button> -->
     </div>
   </div>
   <div id="display-search-tag"></div>

@@ -13,17 +13,31 @@
   const addedTagSpace = document.querySelector('#added-tag-space');
   const inputSearchTag = document.querySelector('#input-search-tag');
   const displaySearchTag = document.querySelector('#display-search-tag');
-  const LSkey = 'informationList';
-  const targetTags = [];
+  const sortColumList = document.querySelector('#sort-colum-list');
+  const LSkey = 'informationList'; //ローカルストレージのキー
+  const targetTags = []; //絞り込みに使われているタグのリスト
+  let informationWindowKey = ''; //ブックマークウィンドウで操作している情報のキー
+  // let informationOrder = []; //ブックマークの表示順を表すキーのリスト
+
+  // 起動時の処理
+  // ローカルストレージから情報を読み込む
   let informationList = {};
-  let informationWindowKey = '';
   if (!(localStorage[LSkey] == "undefined" || typeof localStorage[LSkey] == "undefined")) {
     informationList = JSON.parse(localStorage[LSkey]);
   }
+  // informationListの内容を表示
+  Object.keys(informationList).forEach(key => {
+    displayInformation(key);
+  })
+
+  // ブックマークが持つ情報のデフォルト値
   const originInformation = {
-    name: 'sampleName',
-    url: 'sampleUrl',
-    tag: ['sampleTag1', 'sampleTag2'],
+    name: '',
+    url: '',
+    tag: [],
+    lastUsedTime: 0,
+    addedTime: 0,
+    usedNumber: 0,
   }
 
   // タグ検索の追加ボタンを押したときの処理
@@ -42,19 +56,12 @@
       targetTags.splice(ind, 1);
       search();
     })
-    tag.appendChild(delButton)
+    tag.appendChild(delButton);
     displaySearchTag.appendChild(tag);
-    
     inputSearchTag.value = '';
     targetTags.push(tag.text);
     search();
   })
-
-  // informationListの内容を表示
-  Object.keys(informationList).forEach(key => {
-    displayInformation(informationList[key], key);
-  })
-
 
   // リストに追加する情報の入力画面を表示
   addButton.addEventListener('click', () => {
@@ -77,15 +84,15 @@
     cloneInformation.name = addName.value;
     cloneInformation.url = addUrl.value;
     cloneInformation.tag = [];
+    cloneInformation.addedTime = Date.now();
     for (let i = 0; i < addedTagSpace.children.length; i++) {
       const tag = addedTagSpace.children[i];
       if (tag.value == '') {continue;}
       cloneInformation.tag.push(tag.value);
-      console.log(`tag[${i}]:${tag.value}`);
     }
     informationList[informationWindowKey] = cloneInformation;
-    // 情報を書き込む
-    displayInformation(cloneInformation, informationWindowKey);
+    // 情報を表示する
+    displayInformation(informationWindowKey);
     save();
     // ウィンドウを閉じる
     closeWindow();
@@ -104,13 +111,19 @@
   }
 
   // informationをサイト上のリストに追加
-  function displayInformation(information, key) {
+  function displayInformation(key) {
+    const information = informationList[key]
     const cloneTbody = originTbody.cloneNode(true);
     cloneTbody.id = key;
     mainTable.appendChild(cloneTbody);
     const name = document.querySelector(`#${key} .display-name`);
     name.text  = information.name;
     name.setAttribute("href", information.url);
+    name.addEventListener('click', () => {
+      informationList[key].lastUsedTime = Date.now();
+      informationList[key].usedNumber += 1;
+      save();
+    })
     information.tag.forEach(infoTag => {
       if (infoTag == '') {return;}
       const newTag = document.createElement('li');
@@ -151,12 +164,9 @@
 
   // タグによる検索
   function search() {
-    console.log(targetTags.length);
     if (targetTags.length == 0) { //絞り込みなし
-      console.log(informationList);
       Object.keys(informationList).forEach(key => {
         document.querySelector(`#${key}`).classList.remove('hidden');
-        console.log(document.querySelector(`#${key}`).classList);
       });
     } else { // 絞り込みあり
       Object.keys(informationList).forEach(key => {
@@ -220,4 +230,40 @@
   mask.addEventListener('click', () => {
     closeWindow();
   })
+
+  // 並び変えの処理
+  const sortIndicator = document.querySelector('.sort-indicator');
+  function sort() {
+    const colum = sortColumList.value;
+    // ソートされたキーのリストを作成
+    const informationOrder = Object.keys(informationList);
+    informationOrder.sort((a,b) => {
+      if (sortIndicator.classList.contains('asc')) {
+        return informationList[a][colum] - informationList[b][colum];
+      } else if (sortIndicator.classList.contains('desc')) {
+        return informationList[b][colum] - informationList[a][colum];
+      }
+    });
+    // 表の中身を全削除
+    while (mainTable.firstChild) {
+      mainTable.removeChild(mainTable.firstChild);
+    }
+    // ソートされた順に表に表示
+    informationOrder.forEach((key) => {
+      displayInformation(key);
+    })
+    search();
+  }
+  sortColumList.addEventListener('change', () => {
+    sort();
+  });
+  // 昇順、降順の切り替え
+  sortIndicator.addEventListener('click', () => {
+    if (sortIndicator.classList.contains('asc')) {
+      sortIndicator.classList.replace('asc', 'desc');
+    } else if (sortIndicator.classList.contains('desc')) {
+      sortIndicator.classList.replace('desc', 'asc');
+    }
+    sort();
+  });
 }

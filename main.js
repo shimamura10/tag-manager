@@ -12,12 +12,11 @@
   const addTag = document.querySelector('.add-tag');
   const addedTagSpace = document.querySelector('#added-tag-space');
   const inputSearchTag = document.querySelector('#input-search-tag');
-  const displaySearchTag = document.querySelector('#display-search-tag');
+  const searchTagList = document.querySelector('#search-tag-list');
   const sortColumList = document.querySelector('#sort-colum-list');
-  const LSkey = 'informationList'; //ローカルストレージのキー
-  const targetTags = []; //絞り込みに使われているタグのリスト
-  let informationWindowKey = ''; //ブックマークウィンドウで操作している情報のキー
-  // let informationOrder = []; //ブックマークの表示順を表すキーのリスト
+  const LSkey = 'informationList'; // ローカルストレージのキー
+  const targetTags = []; // 絞り込みに使われているタグのリスト
+  let informationWindowKey = ''; // ブックマークウィンドウで操作している情報のキー
 
   // 起動時の処理
   // ローカルストレージから情報を読み込む
@@ -44,23 +43,8 @@
   document.querySelector('#add-search-tag').addEventListener('click', () => {
     // タグ要素の追加と表示
     if (inputSearchTag.value == '') {return;}
-    const tag = document.createElement('a');
-    tag.classList.add("searchTag");
-    tag.text = inputSearchTag.value;
-    const delButton = document.createElement('input');
-    delButton.setAttribute('type', 'button');
-    delButton.setAttribute('value', 'X');
-    delButton.addEventListener('click', () => {
-      delButton.parentElement.remove();
-      const ind = targetTags.indexOf(delButton.parentElement.text);
-      targetTags.splice(ind, 1);
-      search();
-    })
-    tag.appendChild(delButton);
-    displaySearchTag.appendChild(tag);
+    addSearchTag(inputSearchTag.value);
     inputSearchTag.value = '';
-    targetTags.push(tag.text);
-    search();
   })
 
   // リストに追加する情報の入力画面を表示
@@ -266,4 +250,60 @@
     }
     sort();
   });
+
+  // フィルター関連
+  function addSearchTag(searchTag) {
+    const tag = document.createElement('a');
+    tag.classList.add("searchTag");
+    tag.text = searchTag;
+    const delButton = document.createElement('input');
+    delButton.setAttribute('type', 'button');
+    delButton.setAttribute('value', 'X');
+    delButton.addEventListener('click', () => {
+      delButton.parentElement.remove();
+      const ind = targetTags.indexOf(delButton.parentElement.text);
+      targetTags.splice(ind, 1);
+      search();
+    })
+    tag.appendChild(delButton);
+    searchTagList.appendChild(tag);
+    targetTags.push(tag.text);
+    search();
+  }
+
+  function displaySearchTags(searchString = '') {
+    const tagSet = new Set();
+    Object.keys(informationList).forEach(key => {
+      informationList[key].tag.forEach(tag => {
+        tagSet.add(tag);
+      })
+    });
+    const tagList = Array.from(tagSet);
+    tagList.sort();
+    console.log(tagList);
+    const filterTagList = document.querySelector('#filter-tag-list');
+    deleteAllChilds(filterTagList);
+    tagList.forEach(tag => {
+      if (searchString == '' || tag.indexOf(searchString) != -1){
+        const tagli = document.createElement('li');
+        tagli.classList.add('filter-tag');
+        tagli.textContent = tag;
+        tagli.addEventListener('click', () => {
+          addSearchTag(tagli.textContent);
+        });
+        filterTagList.appendChild(tagli);
+      }
+    });
+  }
+  displaySearchTags();
+  const searchInTags = document.querySelector('#search-in-tags');
+  searchInTags.addEventListener('keyup', () => {
+    displaySearchTags(searchInTags.value);
+  })
+
+  function deleteAllChilds(parent) {
+    while (parent.firstChild) {
+      parent.removeChild(parent.firstChild);
+    }
+  }
 }

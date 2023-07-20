@@ -12,11 +12,12 @@ body {
 .searchTag {
   border: 1px solid black;
   border-radius: 4px;
-  display: inline;
+  display: inline-block;
   padding: 0 4px;
+  margin: 4px;
 }
-.sort {
-  margin-left: 120px;
+.searchTag > input {
+  margin: auto auto auto 4px;
 }
 /* ソートアイコン */
 #sort-colum-list {
@@ -26,8 +27,8 @@ body {
 }
 #panel {
   display: inline-block;
-  width: 2rem;
-  height: 2rem;
+  width: 1.6rem;
+  height: 1.6rem;
   border: none;
 }
 .sort-indicator {
@@ -36,24 +37,36 @@ body {
 .sort-indicator::before,
 .sort-indicator::after {
   content: "";
-  height: 1em;
-  width: 1em;
+  width: 0.8em;
+  height: 0.8em;
   position: absolute;
-  border: 0.5em solid transparent;
+  border: 0.4em solid transparent;
 }
 .sort-indicator::before {
   border-bottom-color: #aaa;
-  margin-top: -0.05em;
+  /* margin-top: -0.05em; */
 }
 .sort-indicator::after {
   border-top-color: #aaa;
-  margin-top: 1.05em;
+  margin-top: 0.9em;
 }
 .sort-indicator.asc::before {
   border-bottom-color: #444;
 }
 .sort-indicator.desc::after {
   border-top-color: #444;
+}
+#filter-button {
+  position: absolute;
+  right: 23%;
+  cursor: pointer;
+}
+#filter-button > img {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 7px;
+  left: 64px;
 }
 
 /* 表 */
@@ -131,12 +144,13 @@ td {
 }
 #select-button {
   display: block;
-  margin: auto auto 24px;
+  margin: auto auto 12px;
+  font-size: 24px;
 }
 #added-tag-space {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 0;
+  margin-top: 12px;
   margin-bottom: 24px;
 }
 .add-tag {
@@ -204,18 +218,57 @@ a.btn--radius {
   cursor: pointer;
 }
 
-.filter {
+#filter-window {
   border: 1px solid black;
   border-radius: 20px;
-  background-color: #ccc;
-  width: 80%;
-  max-width: 600px;
+  background-color: rgba(200, 200, 200, 0.9);
+  width: 400px;
+  /* max-width: 600px; */
   /* height: 240px; */
-  padding: 40px;
+  padding: 0 32px;
   position: absolute;
   left: auto;
-  right: 0;
+  right: 40px;
   margin: 0 auto;
   top: 100px;
   transition: transform 0.4s;
+}
+#filter-window > button {
+  font-size: 20px;
+  position: absolute;
+  top: 24px;
+  right: 24px;
+}
+#filter-window > p {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+#search-tag-list {
+  background-color: none;
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+#filter-window li:hover {
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+.search-box {
+  position: relative;
+}
+.search-box::before {
+  content: "";
+  width: 16px;
+  height: 16px;
+  background: url("./fig/虫眼鏡の無料アイコン8.png") no-repeat center center / auto 100%;
+  display: inline-block;
+  position: absolute;
+  top: 19px;
+  left: 4px;
+}
+.search-box > input {
+  padding-left: 20px;
+  margin-top: 16px;
 }

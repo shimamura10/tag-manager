@@ -10,17 +10,17 @@
   <h1>Tag manager</h1>
   <div>
     <p>ブックマークをタグで管理できるサイトです。<a href="https://github.com/shimamura10/tag-manager" target="_blank">使い方やソースコード</a></p>
-    <p>右上の登録ボタンからリストに追加してください。</p>
+    <p>右上の登録ボタンからリストにブックマークを追加してください。</p>
   </div>
   <!-- 登録ボタン -->
   <input type="button" value="登録＋" id="add-button" class="btn btn--orange btn--radius">
 
   <div class="search">
-    <div>
+    <!-- <div>
       Search in tags 
       <input type="text" id="input-search-tag">
       <button id="add-search-tag">追加</button>
-    </div>
+    </div> -->
     <div class="sort">
       Sort by
       <select id="sort-colum-list">
@@ -32,6 +32,10 @@
         <div class="sort-indicator asc">
         </div>
       </div>
+    </div>
+    <div id="filter-button">
+      Filter
+      <img src="./fig/フィルタの無料アイコン2.png">
     </div>
   </div>
   <!-- <div id="display-search-tag"></div> -->
@@ -66,9 +70,13 @@
     <input type="button" value="決定" id="select-button">
   </div>
 
-  <div class="filter">
+  <div id="filter-window" class="hidden">
+    <p>Search in</p>
+    <button>X</button>
     <div id="search-tag-list"></div>
-    <input type="text" id="search-in-tags">
+    <div class="search-box">
+      <input type="text" id="search-in-tags" placeholder="タグ名を入力">
+    </div>
     <ul id="filter-tag-list">
       <li class="filter-tag">tag1</li>
     </ul>

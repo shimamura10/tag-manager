@@ -12,11 +12,11 @@
   const addTag = document.querySelector('.add-tag');
   const addedTagSpace = document.querySelector('#added-tag-space');
   const searchTagList = document.querySelector('#search-tag-list');
-  const sortColumList = document.querySelector('#sort-colum-list');
+  const sortColumList = document.querySelector('#sort-colum-list'); // ソート項目を指定するドロップダウンリスト
+  const sortIndicator = document.querySelector('.sort-indicator'); //昇順降順を示すアイコン
   const LSkey = 'informationList'; // ローカルストレージのキー
   const targetTags = []; // 絞り込みに使われているタグのリスト
   let informationWindowKey = ''; // ブックマークウィンドウで操作している情報のキー
-  
   // ブックマークが持つ情報のデフォルト値
   const originInformation = {
     name: '',
@@ -37,14 +37,18 @@
   Object.keys(informationList).forEach(key => {
     displayInformation(key);
   })
+  // ブックマークリストの並び変え
+  sort();
+  // filterウィンドウにタグを表示
+  displaySearchTags();
 
-  // リストに追加する情報の入力画面を表示
+  // ブックマークの登録
+  // 登録ボタンの処理を設定
   addButton.addEventListener('click', () => {
     mask.classList.remove('hidden');
     informationWindow.classList.remove('hidden');
     informationWindow.classList.add('add');
   });
-
   // ブックマーク情報ウィンドウの決定ボタンの処理
   selectButton.addEventListener('click', () => {
     if (informationWindow.classList.contains('add')) { //登録ボタンを押したときの処理
@@ -69,6 +73,8 @@
     // 情報を表示する
     displayInformation(informationWindowKey);
     save();
+    // Sort順で並び変える
+    sort();
     // ウィンドウを閉じる
     closeWindow();
   });
@@ -76,14 +82,136 @@
   document.querySelector('#add-tag-button').addEventListener('click', () => {
     cloneTag();
   });
-  // filterウィンドウにタグを表示
-  displaySearchTags();
-  // タグ検索ボックスの設定
-  const searchInTags = document.querySelector('#search-in-tags');
-  searchInTags.addEventListener('keyup', () => {
-    displaySearchTags(searchInTags.value);
+  // ブックマーク情報ウィンドウの外側をクリックすると閉じる
+  mask.addEventListener('click', () => {
+    closeWindow();
+  })
+  // 次に登録するブックマークのキーを返す
+  function nextKey() {
+    let tmp = localStorage['keyNum'];
+    if (typeof tmp == "undefined") {
+      tmp = 1;
+    }
+    localStorage['keyNum'] = Number(tmp) + 1;
+    return 'key-' + tmp;
+  }
+  // ブックマーク情報ウィンドウを閉じる
+  function closeWindow() {
+    mask.classList.add('hidden');
+    informationWindow.classList.add('hidden');
+    addName.value = '';
+    addUrl.value = '';
+    const l = addedTagSpace.children.length;
+    for (let i = 0; i < l; i++) {
+      if (i == 0) {
+        addedTagSpace.children[i].value = '';
+      } else {
+        addedTagSpace.lastElementChild.remove();
+      }
+    }
+  }
+
+  // ソートの処理
+  // sortColumListとsortIndicatorに従ってソートする
+  function sort() {
+    const colum = sortColumList.value;
+    // ソートされたキーのリストを作成
+    const informationOrder = Object.keys(informationList);
+    informationOrder.sort((a,b) => {
+      if (sortIndicator.classList.contains('asc')) {
+        return informationList[a][colum] - informationList[b][colum];
+      } else if (sortIndicator.classList.contains('desc')) {
+        return informationList[b][colum] - informationList[a][colum];
+      }
+    });
+    // 表の中身を全削除
+    while (mainTable.firstChild) {
+      mainTable.removeChild(mainTable.firstChild);
+    }
+    // ソートされた順に表に表示
+    informationOrder.forEach((key) => {
+      displayInformation(key);
+    })
+    search();
+  }
+  sortColumList.addEventListener('change', () => {
+    sort();
+  });
+  // 昇順、降順の切り替え
+  sortIndicator.addEventListener('click', () => {
+    if (sortIndicator.classList.contains('asc')) {
+      sortIndicator.classList.replace('asc', 'desc');
+    } else if (sortIndicator.classList.contains('desc')) {
+      sortIndicator.classList.replace('desc', 'asc');
+    }
+    sort();
   });
 
+  // フィルター関連
+  // フィルターボタンにイベントを設定
+  document.querySelector('#filter-button').addEventListener('click', () => {
+    document.querySelector('#filter-window').classList.toggle('hidden');
+  });
+  // フィルターウィンドウを消すボタンの設定
+  document.querySelector('#filter-window > button').addEventListener('click', () => {
+    document.querySelector('#filter-window').classList.add('hidden');
+  });
+    // タグ検索ボックスの設定
+    const searchInTags = document.querySelector('#search-in-tags');
+    searchInTags.addEventListener('keyup', () => {
+      displaySearchTags(searchInTags.value);
+    });
+  // 絞り込みに使うタグをページに表示する
+  function addSearchTag(searchTag) {
+    // 絞り込みタグのhtml要素を作成
+    const tag = document.createElement('a');
+    tag.classList.add("searchTag");
+    tag.text = searchTag;
+    // 絞り込みタグを消すボタンを付ける
+    const delButton = document.createElement('input');
+    delButton.setAttribute('type', 'button');
+    delButton.setAttribute('value', 'X');
+    delButton.addEventListener('click', () => {
+      delButton.parentElement.remove();
+      const ind = targetTags.indexOf(delButton.parentElement.text);
+      targetTags.splice(ind, 1);
+      search();
+    });
+    tag.appendChild(delButton);
+    searchTagList.appendChild(tag);  // 作成した絞り込みタグを表示
+    targetTags.push(tag.text); // 絞り込みタグの内部的なリストに追加
+    search(); // 絞り込みタグに従って表示するブックマークを選びなおす
+  }
+  // searchStringを含むタグのみを表示する
+  function displaySearchTags(searchString = '') {
+    // 現存する全タグをtagSetに入れる
+    const tagSet = new Set();
+    Object.keys(informationList).forEach(key => {
+      informationList[key].tag.forEach(tag => {
+        tagSet.add(tag);
+      })
+    });
+    const tagList = Array.from(tagSet);
+    tagList.sort(); // アルファベット順にする
+    // 表示されているタグを全部消す
+    const filterTagList = document.querySelector('#filter-tag-list');
+    deleteAllChilds(filterTagList);
+    // 全タグのうちsearchStringを含むものだけ表示する
+    // searchStringが空のときは全部表示
+    tagList.forEach(tag => {
+      if (searchString == '' || tag.indexOf(searchString) != -1){
+        const tagli = document.createElement('li');
+        tagli.classList.add('filter-tag');
+        tagli.textContent = tag;
+        tagli.addEventListener('click', () => {
+          addSearchTag(tagli.textContent);
+        });
+        filterTagList.appendChild(tagli);
+      }
+    });
+  }
+
+  // 使いまわす処理
   // informationをサイト上のリストに追加
   function displayInformation(key) {
     const information = informationList[key]
@@ -131,12 +259,28 @@
     });
   }
 
+  // 登録されている情報を消す
+  function deliteInformation(key) {
+    delete informationList[key];
+    document.querySelector(`#${key}`).remove();
+    save();
+  }
+
+  // 登録ウィンドウのタグ入力欄をnum個増やす
+  function cloneTag(num=1) {
+    for (let i = 0; i < num; i++) {
+      const cloneTag = addTag.cloneNode(true);
+      addedTagSpace.appendChild(cloneTag);
+      cloneTag.value = '';
+    }
+  }
+
   // informationListをローカルストレージに保存
   function save() {
     localStorage.setItem(LSkey, JSON.stringify(informationList))
   }
 
-  // タグによる検索
+  // タグによる検索（絞り込み）
   function search() {
     if (targetTags.length == 0) { //絞り込みなし
       Object.keys(informationList).forEach(key => {
@@ -167,154 +311,11 @@
     }
   }
 
-  // 次のキーを返す
-  function nextKey() {
-    let tmp = localStorage['keyNum'];
-    if (typeof tmp == "undefined") {
-      tmp = 1;
-    }
-    localStorage['keyNum'] = Number(tmp) + 1;
-    return 'key-' + tmp;
-  }
-
-  // ブックマーク情報ウィンドウを閉じる
-  function closeWindow() {
-    mask.classList.add('hidden');
-    informationWindow.classList.add('hidden');
-    addName.value = '';
-    addUrl.value = '';
-    const l = addedTagSpace.children.length;
-    for (let i = 0; i < l; i++) {
-      if (i == 0) {
-        addedTagSpace.children[i].value = '';
-      } else {
-        addedTagSpace.lastElementChild.remove();
-      }
-    }
-  }
-
-  // 登録されている情報を消す
-  function deliteInformation(key) {
-    delete informationList[key];
-    document.querySelector(`#${key}`).remove();
-    save();
-  }
-
-  // ブックマーク情報ウィンドウの外側をクリックすると閉じる
-  mask.addEventListener('click', () => {
-    closeWindow();
-  })
-
-  // 並び変えの処理
-  const sortIndicator = document.querySelector('.sort-indicator');
-  function sort() {
-    const colum = sortColumList.value;
-    // ソートされたキーのリストを作成
-    const informationOrder = Object.keys(informationList);
-    informationOrder.sort((a,b) => {
-      if (sortIndicator.classList.contains('asc')) {
-        return informationList[a][colum] - informationList[b][colum];
-      } else if (sortIndicator.classList.contains('desc')) {
-        return informationList[b][colum] - informationList[a][colum];
-      }
-    });
-    // 表の中身を全削除
-    while (mainTable.firstChild) {
-      mainTable.removeChild(mainTable.firstChild);
-    }
-    // ソートされた順に表に表示
-    informationOrder.forEach((key) => {
-      displayInformation(key);
-    })
-    search();
-  }
-  sortColumList.addEventListener('change', () => {
-    sort();
-  });
-  // 昇順、降順の切り替え
-  sortIndicator.addEventListener('click', () => {
-    if (sortIndicator.classList.contains('asc')) {
-      sortIndicator.classList.replace('asc', 'desc');
-    } else if (sortIndicator.classList.contains('desc')) {
-      sortIndicator.classList.replace('desc', 'asc');
-    }
-    sort();
-  });
-
-  // フィルター関連
-  // フィルターボタンにイベントを設定
-  document.querySelector('#filter-button').addEventListener('click', () => {
-    document.querySelector('#filter-window').classList.toggle('hidden');
-  });
-  // フィルターウィンドウを消すボタンの設定
-  document.querySelector('#filter-window > button').addEventListener('click', () => {
-    document.querySelector('#filter-window').classList.add('hidden');
-  });
-
-  // 絞り込みに使うタグをページに表示する
-  function addSearchTag(searchTag) {
-    // 絞り込みタグのhtml要素を作成
-    const tag = document.createElement('a');
-    tag.classList.add("searchTag");
-    tag.text = searchTag;
-    // 絞り込みタグを消すボタンを付ける
-    const delButton = document.createElement('input');
-    delButton.setAttribute('type', 'button');
-    delButton.setAttribute('value', 'X');
-    delButton.addEventListener('click', () => {
-      delButton.parentElement.remove();
-      const ind = targetTags.indexOf(delButton.parentElement.text);
-      targetTags.splice(ind, 1);
-      search();
-    })
-    tag.appendChild(delButton);
-    searchTagList.appendChild(tag);  // 作成した絞り込みタグを表示
-    targetTags.push(tag.text); // 絞り込みタグの内部的なリストに追加
-    search(); // 絞り込みタグに従って表示するブックマークを選びなおす
-  }
-
-  // searchStringを含むタグのみを表示する
-  function displaySearchTags(searchString = '') {
-    // 現存する全タグをtagSetに入れる
-    const tagSet = new Set();
-    Object.keys(informationList).forEach(key => {
-      informationList[key].tag.forEach(tag => {
-        tagSet.add(tag);
-      })
-    });
-    const tagList = Array.from(tagSet);
-    tagList.sort(); // アルファベット順にする
-    // 表示されているタグを全部消す
-    const filterTagList = document.querySelector('#filter-tag-list');
-    deleteAllChilds(filterTagList);
-    // 全タグのうちsearchStringを含むものだけ表示する
-    // searchStringが空のときは全部表示
-    tagList.forEach(tag => {
-      if (searchString == '' || tag.indexOf(searchString) != -1){
-        const tagli = document.createElement('li');
-        tagli.classList.add('filter-tag');
-        tagli.textContent = tag;
-        tagli.addEventListener('click', () => {
-          addSearchTag(tagli.textContent);
-        });
-        filterTagList.appendChild(tagli);
-      }
-    });
-  }
-
-  // 登録ウィンドウのタグ入力欄をnum個増やす
-  function cloneTag(num=1) {
-    for (let i = 0; i < num; i++) {
-      const cloneTag = addTag.cloneNode(true);
-      addedTagSpace.appendChild(cloneTag);
-      cloneTag.value = '';
-    }
-  }
-
   // parentの子要素を全部削除
   function deleteAllChilds(parent) {
     while (parent.firstChild) {
       parent.removeChild(parent.firstChild);
     }
   }
+
 }
